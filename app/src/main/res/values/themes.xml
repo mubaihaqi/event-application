@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.EventApplication" parent="Theme.AppCompat.Light.NoActionBar">
 
-    <style name="Theme.EventApplication" parent="android:Theme.Material.Light.NoActionBar" />
+    </style>
 </resources>
