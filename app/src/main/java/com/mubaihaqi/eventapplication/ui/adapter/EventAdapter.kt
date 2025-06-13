@@ -18,8 +18,6 @@ class EventAdapter(
     inner class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgEvent: ImageView = itemView.findViewById(R.id.img_event)
         val tvName: TextView = itemView.findViewById(R.id.tv_event_name)
-        val tvDate: TextView = itemView.findViewById(R.id.tv_event_date)
-        val tvLocation: TextView = itemView.findViewById(R.id.tv_event_location)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -30,8 +28,6 @@ class EventAdapter(
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event = list[position]
         holder.tvName.text = event.name
-        holder.tvDate.text = event.beginTime
-        holder.tvLocation.text = event.cityName
         Glide.with(holder.itemView.context)
             .load(event.imageLogo)
             .placeholder(R.drawable.ic_launcher_background)
@@ -40,6 +36,7 @@ class EventAdapter(
     }
 
     override fun getItemCount() = list.size
+
     fun updateData(newList: List<ListEventsItem>) {
         list = newList
         notifyDataSetChanged()

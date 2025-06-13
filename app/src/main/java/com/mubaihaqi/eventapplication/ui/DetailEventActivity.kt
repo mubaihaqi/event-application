@@ -1,10 +1,16 @@
 package com.mubaihaqi.eventapplication.ui
 
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import com.bumptech.glide.Glide
+import com.mubaihaqi.eventapplication.R
 import com.mubaihaqi.eventapplication.databinding.ActivityDetailEventBinding
 
 class DetailEventActivity : AppCompatActivity() {
@@ -22,10 +28,25 @@ class DetailEventActivity : AppCompatActivity() {
         val imageUrl = intent.getStringExtra(EXTRA_IMAGE)
         val link = intent.getStringExtra(EXTRA_LINK)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = name
+
         binding.tvEventNameDetail.text = name
         binding.tvEventDateDetail.text = date
         binding.tvEventLocationDetail.text = location
-        binding.tvEventDescDetail.text = desc
+
+        supportActionBar?.title = HtmlCompat.fromHtml(
+            "<font color='#FFFFFF'>$name</font>",
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        val descClean = desc ?: ""
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            binding.tvEventDescDetail.text = android.text.Html.fromHtml(descClean, android.text.Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            binding.tvEventDescDetail.text = android.text.Html.fromHtml(descClean)
+        }
+
         Glide.with(this)
             .load(imageUrl)
             .into(binding.imgEventDetail)
@@ -36,6 +57,16 @@ class DetailEventActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.teal_700)))
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {

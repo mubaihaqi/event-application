@@ -1,13 +1,13 @@
 package com.mubaihaqi.eventapplication.fragment
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +35,7 @@ class FinishedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Dicoding Event App"
 
         eventAdapter = EventAdapter(emptyList()) { event ->
             val intent = Intent(requireContext(), DetailEventActivity::class.java)
@@ -50,7 +51,6 @@ class FinishedFragment : Fragment() {
         binding.rvEvents.layoutManager = LinearLayoutManager(requireContext())
         binding.rvEvents.adapter = eventAdapter
 
-        // Perhatikan, gunakan finishedEvents, bukan listEvents
         eventViewModel.finishedEvents.observe(viewLifecycleOwner) { events ->
             fullEventList = events
             eventAdapter.updateData(events)
@@ -85,6 +85,12 @@ class FinishedFragment : Fragment() {
         }
 
         eventViewModel.getFinishedEvents()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as androidx.appcompat.app.AppCompatActivity).supportActionBar?.title =
+            HtmlCompat.fromHtml("<font color='#FFFFFF'>Finished</font>", HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     private fun filterEvents(query: String?) {

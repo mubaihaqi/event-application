@@ -1,7 +1,9 @@
 package com.mubaihaqi.eventapplication.ui
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mubaihaqi.eventapplication.R
 import com.mubaihaqi.eventapplication.fragment.FinishedFragment
@@ -43,5 +45,9 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.teal_700)))
     }
+
+
 }
