@@ -16,6 +16,7 @@
         <activity android:name=".ui.DetailEventActivity" />
         <activity
             android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.EventApplication">

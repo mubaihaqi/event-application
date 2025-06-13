@@ -20,6 +20,7 @@ class DetailEventActivity : AppCompatActivity() {
         val location = intent.getStringExtra(EXTRA_LOCATION)
         val desc = intent.getStringExtra(EXTRA_DESC)
         val imageUrl = intent.getStringExtra(EXTRA_IMAGE)
+        val link = intent.getStringExtra(EXTRA_LINK)
 
         binding.tvEventNameDetail.text = name
         binding.tvEventDateDetail.text = date
@@ -30,9 +31,10 @@ class DetailEventActivity : AppCompatActivity() {
             .into(binding.imgEventDetail)
 
         binding.btnRegister.setOnClickListener {
-            val url = "https://www.dicoding.com"
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(intent)
+            if (!link.isNullOrBlank()) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                startActivity(intent)
+            }
         }
     }
 
@@ -42,5 +44,6 @@ class DetailEventActivity : AppCompatActivity() {
         const val EXTRA_LOCATION = "extra_location"
         const val EXTRA_DESC = "extra_desc"
         const val EXTRA_IMAGE = "extra_image"
+        const val EXTRA_LINK = "extra_link"
     }
 }

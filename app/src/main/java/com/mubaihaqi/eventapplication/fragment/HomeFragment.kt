@@ -13,16 +13,15 @@ import com.mubaihaqi.eventapplication.data.model.ListEventsItem
 import com.mubaihaqi.eventapplication.databinding.FragmentHomeBinding
 import com.mubaihaqi.eventapplication.ui.DetailEventActivity
 import com.mubaihaqi.eventapplication.ui.adapter.EventAdapter
+import com.mubaihaqi.eventapplication.ui.adapter.UpcomingEventAdapter
 import com.mubaihaqi.eventapplication.viewmodel.EventViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
     private val eventViewModel: EventViewModel by viewModels()
-    private lateinit var upcomingAdapter: EventAdapter
+    private lateinit var upcomingAdapter: UpcomingEventAdapter
     private lateinit var finishedAdapter: EventAdapter
 
     override fun onCreateView(
@@ -36,12 +35,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        upcomingAdapter = EventAdapter(emptyList()) { event ->
-            openDetail(event)
-        }
-        finishedAdapter = EventAdapter(emptyList()) { event ->
-            openDetail(event)
-        }
+        upcomingAdapter = UpcomingEventAdapter(emptyList()) { event -> openDetail(event) }
+        finishedAdapter = EventAdapter(emptyList()) { event -> openDetail(event) }
 
         binding.rvUpcoming.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvUpcoming.adapter = upcomingAdapter
@@ -49,22 +44,22 @@ class HomeFragment : Fragment() {
         binding.rvFinished.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFinished.adapter = finishedAdapter
 
-        eventViewModel.listEvents.observe(viewLifecycleOwner) { events ->
-            upcomingAdapter.updateData(filterUpcomingEvents(events))
-            finishedAdapter.updateData(filterFinishedEvents(events))
+        eventViewModel.upcomingEvents.observe(viewLifecycleOwner) { events ->
+            upcomingAdapter.updateData(events)
+        }
+        eventViewModel.finishedEvents.observe(viewLifecycleOwner) { events ->
+            finishedAdapter.updateData(events)
         }
 
         eventViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
-
         eventViewModel.error.observe(viewLifecycleOwner) { errorMsg ->
-            errorMsg?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
-            }
+            errorMsg?.let { Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show() }
         }
 
-        eventViewModel.getEvents()
+        eventViewModel.getUpcomingEvents()
+        eventViewModel.getFinishedEvents()
     }
 
     private fun openDetail(event: ListEventsItem) {
@@ -74,33 +69,8 @@ class HomeFragment : Fragment() {
         intent.putExtra(DetailEventActivity.EXTRA_LOCATION, event.cityName)
         intent.putExtra(DetailEventActivity.EXTRA_DESC, event.description)
         intent.putExtra(DetailEventActivity.EXTRA_IMAGE, event.imageLogo)
+        intent.putExtra(DetailEventActivity.EXTRA_LINK, event.link)
         startActivity(intent)
-    }
-
-    private fun filterUpcomingEvents(events: List<ListEventsItem>): List<ListEventsItem> {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = sdf.parse(sdf.format(Date()))
-        return events.filter {
-            try {
-                val eventDate = sdf.parse(it.beginTime)
-                eventDate != null && eventDate.after(today)
-            } catch (e: Exception) {
-                false
-            }
-        }
-    }
-
-    private fun filterFinishedEvents(events: List<ListEventsItem>): List<ListEventsItem> {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = sdf.parse(sdf.format(Date()))
-        return events.filter {
-            try {
-                val eventDate = sdf.parse(it.beginTime)
-                eventDate != null && eventDate.before(today)
-            } catch (e: Exception) {
-                false
-            }
-        }
     }
 
     override fun onDestroyView() {

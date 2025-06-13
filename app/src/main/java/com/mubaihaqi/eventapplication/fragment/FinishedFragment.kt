@@ -1,10 +1,12 @@
 package com.mubaihaqi.eventapplication.fragment
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -41,13 +43,15 @@ class FinishedFragment : Fragment() {
             intent.putExtra(DetailEventActivity.EXTRA_LOCATION, event.cityName)
             intent.putExtra(DetailEventActivity.EXTRA_DESC, event.description)
             intent.putExtra(DetailEventActivity.EXTRA_IMAGE, event.imageLogo)
+            intent.putExtra(DetailEventActivity.EXTRA_LINK, event.link)
             startActivity(intent)
         }
 
         binding.rvEvents.layoutManager = LinearLayoutManager(requireContext())
         binding.rvEvents.adapter = eventAdapter
 
-        eventViewModel.listEvents.observe(viewLifecycleOwner) { events ->
+        // Perhatikan, gunakan finishedEvents, bukan listEvents
+        eventViewModel.finishedEvents.observe(viewLifecycleOwner) { events ->
             fullEventList = events
             eventAdapter.updateData(events)
         }
@@ -62,18 +66,25 @@ class FinishedFragment : Fragment() {
             }
         }
 
-        binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object :
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filterEvents(query)
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterEvents(newText)
                 return true
             }
         })
 
-        eventViewModel.getEvents()
+        binding.cardSearch.setOnClickListener {
+            binding.searchView.isIconified = false
+            binding.searchView.requestFocusFromTouch()
+        }
+
+        eventViewModel.getFinishedEvents()
     }
 
     private fun filterEvents(query: String?) {

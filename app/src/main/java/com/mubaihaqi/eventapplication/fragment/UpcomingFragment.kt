@@ -14,8 +14,6 @@ import com.mubaihaqi.eventapplication.databinding.FragmentUpcomingBinding
 import com.mubaihaqi.eventapplication.ui.DetailEventActivity
 import com.mubaihaqi.eventapplication.ui.adapter.EventAdapter
 import com.mubaihaqi.eventapplication.viewmodel.EventViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 class UpcomingFragment : Fragment() {
     private var _binding: FragmentUpcomingBinding? = null
@@ -42,8 +40,8 @@ class UpcomingFragment : Fragment() {
         binding.rvUpcoming.layoutManager = LinearLayoutManager(requireContext())
         binding.rvUpcoming.adapter = eventAdapter
 
-        eventViewModel.listEvents.observe(viewLifecycleOwner) { events ->
-            eventAdapter.updateData(filterUpcomingEvents(events))
+        eventViewModel.upcomingEvents.observe(viewLifecycleOwner) { events ->
+            eventAdapter.updateData(events)
         }
 
         eventViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
@@ -56,7 +54,7 @@ class UpcomingFragment : Fragment() {
             }
         }
 
-        eventViewModel.getEvents()
+        eventViewModel.getUpcomingEvents()
     }
 
     private fun openDetail(event: ListEventsItem) {
@@ -66,20 +64,8 @@ class UpcomingFragment : Fragment() {
         intent.putExtra(DetailEventActivity.EXTRA_LOCATION, event.cityName)
         intent.putExtra(DetailEventActivity.EXTRA_DESC, event.description)
         intent.putExtra(DetailEventActivity.EXTRA_IMAGE, event.imageLogo)
+        intent.putExtra(DetailEventActivity.EXTRA_LINK, event.link)
         startActivity(intent)
-    }
-
-    private fun filterUpcomingEvents(events: List<ListEventsItem>): List<ListEventsItem> {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = sdf.parse(sdf.format(Date()))
-        return events.filter {
-            try {
-                val eventDate = sdf.parse(it.beginTime)
-                eventDate != null && eventDate.after(today)
-            } catch (e: Exception) {
-                false
-            }
-        }
     }
 
     override fun onDestroyView() {
